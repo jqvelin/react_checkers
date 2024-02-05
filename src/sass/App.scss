@@ -1,0 +1,113 @@
+@import './config';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}
+
+.main-layout {
+  @include flex-centered;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 85vh
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 0.5rem #816954 solid;
+  box-shadow: 5px 10px 20px black;
+}
+
+.cell {
+  width: 64px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-light {
+  background: rgb(244, 184, 161);
+}
+
+.cell-dark {
+  background: rgb(153, 204, 221);
+}
+
+.checker {
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 4px 4px 5px -2px black;
+  &::before, &::after {
+    width: 48px;
+    aspect-ratio: 1;
+    background: transparent;
+    border: 4px black solid;
+    border-radius: 50%;
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%)
+  }
+
+  &::after {
+    width: 32px;
+  }
+}
+
+.checker-light {
+  background: rgb(220, 220, 220);
+}
+
+.checker-dark {
+  background: rgb(60, 60, 60);
+}
+
+.selected {
+  background: rgb(9, 151, 9);
+}
+
+.won-message {
+  position: fixed;
+  z-index: 1000;
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: sans-serif;
+  background: rgba(255, 255, 255, 0.8);
+  width: calc(64px * 8);
+  height: calc(64px * 8);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  button {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+  }
+}
+
+.queen.checker-dark{
+    &::before{
+      border: 4px dashed rgba(255, 255, 255, 0.8);
+    };
+}
+
+.queen.checker-light{
+  &::before{
+    border: 4px dashed rgb(60, 60, 60);
+  };
+}
