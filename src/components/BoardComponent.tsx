@@ -30,9 +30,11 @@ const BoardComponent: FC<BoardComponentProps> = ({board, setBoard, restart}) => 
             target.object.isQueen = true
         }
 
-        setCurrentPlayer(currentPlayer === Colors.LIGHT ? Colors.DARK : Colors.LIGHT)
-        updateBoard()
+        target.object = selectedCell.object
         selectedCell.object = null
+        updateBoard()
+
+        !target.canEatMore(data) && setCurrentPlayer(currentPlayer === Colors.LIGHT ? Colors.DARK : Colors.LIGHT)
         
         if (!board.cells.find(row => row.find(cell => cell.object?.color === Colors.DARK))){
             setWinner('white')
@@ -62,6 +64,7 @@ const BoardComponent: FC<BoardComponentProps> = ({board, setBoard, restart}) => 
                 </React.Fragment>
             )}
         </div>
+        <h2>Current player: {currentPlayer}</h2>
         </>
     );
 };

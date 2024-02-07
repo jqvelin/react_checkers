@@ -27,6 +27,7 @@ body {
   grid-template-columns: repeat(8, 1fr);
   border: 0.5rem #816954 solid;
   box-shadow: 5px 10px 20px black;
+  border-radius: 4px;
 }
 
 .cell {
@@ -83,6 +84,9 @@ body {
 
 .won-message {
   position: fixed;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
   z-index: 1000;
   font-size: 2rem;
   font-weight: bold;
