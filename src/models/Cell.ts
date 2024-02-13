@@ -5,29 +5,28 @@ import { Colors } from "./Colors"
 export class Cell {
     x: number
     y: number
-    object: Checker | null
+    checker: Checker | null
     color: Colors;
     isAvailable: boolean;
     board: Board
-    constructor(x: number, y: number, object: Checker | null, color: Colors, isAvailable: boolean, board: Board){
+    constructor(x: number, y: number, checker: Checker | null, color: Colors, isAvailable: boolean, board: Board){
         this.x = x
         this.y = y
-        this.object = object
+        this.checker = checker
         this.color = color
         this.isAvailable = isAvailable
         this.board = board
     }
 
     public isEnemy(target: Cell){
-        if (!target.object) return false
-        return target.object && target.object.color !== this.object?.color
+        return target.checker && target.checker.color !== this.checker?.color
     }
 
     public isEmpty(){
-        return !this.object
+        return !this.checker
     }
 
-    public isEmptyDiagonal(target: Cell):boolean {
+    public queenCanEat(target: Cell): Cell | false {
         const absX = Math.abs(target.x - this.x)
         const absY = Math.abs(target.y - this.y)
         if (absY !== absX){
@@ -36,132 +35,76 @@ export class Cell {
 
         const dy = this.y < target.y ? 1 : -1
         const dx = this.x < target.x ? 1 : -1
-
+        let obstacles: Cell[] = []
         for(let i = 1; i < absY; i++){
             if (!this.board.getCell(this.x + dx * i, this.y + dy * i).isEmpty()){
-                return false
+                obstacles.push(this.board.getCell(this.x + dx * i, this.y + dy * i))
             }
         }
-        return true
+        if (obstacles.length === 1 && !obstacles.find(cell => !this.isEnemy(cell))) {
+            return obstacles[0]
+        }
+        return false
     }
 
-    public canEat(target: Cell): {canMove: boolean, beatenChecker: Cell | null}{
-        const dx = target.x - this.x
-        const dy = target.y - this.y
-
-        if (!this.object?.isQueen){
-            if (dy === -2) { // Making two steps up (eating forward if light turn / eating backward if dark turn)
-                if (dx === 2 && this.isEnemy(this.board.getCell(target.x - 1, target.y + 1))) return {
-                        canMove: true,
-                        beatenChecker: this.board.getCell(target.x - 1, target.y + 1)
-                    }
-                
-                if (dx === -2 && this.isEnemy(this.board.getCell(target.x + 1, target.y + 1))) return {
-                        canMove: true,
-                        beatenChecker: this.board.getCell(target.x + 1, target.y + 1)
-                    }
+    public canEat(target: Cell): Cell | false {
+        if (target.checker) return false
+        if (this.checker?.isQueen) return this.queenCanEat(target) 
+        else {
+            const deltaX = target.x - this.x
+            const deltaY = target.y - this.y
+            if (deltaY === -2) {
+                if (deltaX === 2){
+                    return this.isEnemy(this.board.getCell(target.x - 1, target.y + 1)) ? this.board.getCell(target.x - 1, target.y + 1) : false
                 }
-            
-            if (dy === 2) { // Making two steps down (eating forward if dark turn / eating backward if light turn)
-                if (dx === 2 && this.isEnemy(this.board.getCell(target.x - 1, target.y - 1))) return {
-                        canMove: true,
-                        beatenChecker: this.board.getCell(target.x - 1, target.y - 1)
-                    }
-                
-                if (dx === -2 && this.isEnemy(this.board.getCell(target.x + 1, target.y - 1))) return {
-                        canMove: true,
-                        beatenChecker: this.board.getCell(target.x + 1, target.y - 1)
-                    
-    
+                else if (deltaX === -2){
+                    return this.isEnemy(this.board.getCell(target.x + 1, target.y + 1)) ? this.board.getCell(target.x + 1, target.y + 1) : false
                 }
             }
-        } else {
+            else if (deltaY === 2){
+                if (deltaX === 2){
+                    return this.isEnemy(this.board.getCell(target.x - 1, target.y - 1)) ? this.board.getCell(target.x - 1, target.y - 1) : false
+                }
+                else if (deltaX === -2){
+                    return this.isEnemy(this.board.getCell(target.x + 1, target.y - 1)) ? this.board.getCell(target.x + 1, target.y - 1) : false
+                }
+            }
+            return false
+        }
+        
+    }
+
+    public canMove(target: Cell): Cell | false{
+        const deltaX = target.x - this.x
+        const deltaY = target.y - this.y
+
+        if (this.checker?.isQueen){
             const absX = Math.abs(target.x - this.x)
             const absY = Math.abs(target.y - this.y)
             if (absY !== absX){
-                return {
-                    canMove: false,
-                    beatenChecker: null
-                }
+                return false
             }
-            let counter = 0
-            let beatenChecker = null
+
             const dy = this.y < target.y ? 1 : -1
             const dx = this.x < target.x ? 1 : -1
 
-            for(let i = 1; i < absY + 1; i++){
+            for(let i = 1; i < absY; i++){
                 if (!this.board.getCell(this.x + dx * i, this.y + dy * i).isEmpty()){
-                        counter ++ 
-                        beatenChecker = this.isEnemy(this.board.getCell(this.x + dx * i, this.y + dy * i)) ? this.board.getCell(this.x + dx * i, this.y + dy * i) : null
-                    }
-                }
-        
-            if (counter === 0 || counter === 1){
-                return {
-                    canMove: true,
-                    beatenChecker: beatenChecker
+                    return this.canEat(target)
                 }
             }
+            return target
         }
-        return {
-            canMove: false,
-            beatenChecker: null
-        }
-    }
-
-    public canMoveTo(target: Cell): {canMove: boolean, beatenChecker: Cell | null} {
-        if (target.object) return {
-            canMove: false,
-            beatenChecker: null
-        }
-
-        const dx = target.x - this.x
-        const dy = target.y - this.y
-
-        if (!this.object?.isQueen){
-            if ((this.object?.color === Colors.LIGHT && dy === -1) || (this.object?.color === Colors.DARK && dy === 1)){ 
-                if (Math.abs(dx) === 1) return {
-                    canMove: true,
-                    beatenChecker: null
-                } // Common behavior
+        else if (!target.checker?.isQueen){
+            if (deltaY === -1){
+                if (Math.abs(deltaX) === 1 && this.checker?.color === Colors.LIGHT) return target
             }
-            return {canMove: this.canEat(target).canMove, beatenChecker: this.canEat(target).beatenChecker}
-        }
-
-        if (this.object?.isQueen){
-            if (this.isEmptyDiagonal(target)) return {
-                canMove: true,
-                beatenChecker: null
-            }
-            else {
-                return {canMove: this.canEat(target).canMove, beatenChecker: this.canEat(target).beatenChecker}
-            }
-            
-        }
-        
-        return {
-            canMove: false,
-            beatenChecker: null
-        }
-    }
+            else if (deltaY === 1){
+                if (Math.abs(deltaX) === 1 && this.checker?.color === Colors.DARK) return target
     
-    public canEatMore(data: {canMove: boolean, beatenChecker: Cell | null}): boolean{
-            if (this.object?.isQueen){
-                for (let y = 0; y < this.board.cells.length; y++){
-                    for (let x = 0; x < this.board.cells[0].length; x++){
-                        if (data.beatenChecker && this.canEat(this.board.getCell(x, y)).beatenChecker && this.canEat(this.board.getCell(x, y)).canMove) return true
-                    }
-                }
             }
-            else {
-            for (let y = this.y - 2; y <= this.y + 2; y++){
-                for (let x = this.x - 2; x <= this.x + 2; x++){
-                    if (x < 0 || x > this.board.cells[0].length - 1 || y < 0 || y > this.board.cells.length - 1 || this.board.getCell(x, y).object) continue
-                    if (data.beatenChecker && this.canEat(this.board.getCell(x, y)).canMove) return true
-                }
-            }
+            else if (Math.abs(deltaY) > 1) return this.canEat(target)
         }
         return false
-    } 
-
+    }
 }

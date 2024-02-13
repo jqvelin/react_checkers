@@ -16,32 +16,42 @@ const BoardComponent: FC<BoardComponentProps> = ({board, setBoard, restart}) => 
     const [currentPlayer, setCurrentPlayer] = useState(board.turn)
     const [winner, setWinner] = useState<string | null>(null)
     function handleMove(target: Cell){
-        if (selectedCell?.object?.color !== currentPlayer) return
-        const data = selectedCell.canMoveTo(target)
-        if (!data.canMove) return
-        if (data.canMove && data.beatenChecker){
-            target.object = selectedCell.object
-            data.beatenChecker.object = null
-        } else {
-            target.object = selectedCell.object
+        if (target.checker || currentPlayer !== selectedCell?.checker?.color || !selectedCell.canMove(target)) return
+        const initialCheckersQty = board.getCheckersQty()
+        const beatenChecker = selectedCell.canEat(target)
+        if (beatenChecker){
+            beatenChecker.checker = null
         }
-
-        if ((selectedCell.object.color === Colors.LIGHT && target.y === 0) || (selectedCell.object.color === Colors.DARK && target.y === board.cells.length - 1)){
-            target.object.isQueen = true
+        target.checker = selectedCell.checker
+        if ((target.checker.color === Colors.LIGHT && target.y === 0) || (target.checker.color === Colors.DARK && target.y === board.cells.length - 1)){
+            target.checker.isQueen = true
         }
-
-        target.object = selectedCell.object
-        selectedCell.object = null
+        selectedCell.checker = null
         updateBoard()
-
-        !target.canEatMore(data) && setCurrentPlayer(currentPlayer === Colors.LIGHT ? Colors.DARK : Colors.LIGHT)
+        let eatableCheckersQty = 0
+        if (board.getCheckersQty() < initialCheckersQty){
+            
+            for (let y = 0; y < board.cells.length; y++){
+                for (let x = 0; x < board.cells[y].length; x++){
+                    if (target.canEat(board.getCell(x, y))) {
+                        eatableCheckersQty ++
+                    }
+                }
+            }
+            
+        }
         
-        if (!board.cells.find(row => row.find(cell => cell.object?.color === Colors.DARK))){
+        if (eatableCheckersQty === 0) {
+            setCurrentPlayer(currentPlayer === Colors.LIGHT ? Colors.DARK : Colors.LIGHT)
+        }
+        
+        
+        if (!board.cells.find(row => row.find(cell => cell.checker?.color === Colors.DARK))){
             setWinner('white')
             setCurrentPlayer(Colors.LIGHT)
 
         }
-        if (!board.cells.find(row => row.find(cell => cell.object?.color === Colors.LIGHT))){
+        if (!board.cells.find(row => row.find(cell => cell.checker?.color === Colors.LIGHT))){
             setWinner('black')
             setCurrentPlayer(Colors.LIGHT)
         }

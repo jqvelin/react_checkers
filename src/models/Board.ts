@@ -31,18 +31,27 @@ export class Board {
             if (i < 3){
                 for (let j = 0; j < this.cells[i].length; j++){
                     if ((i + j) % 2 !== 0){
-                        this.getCell(j, i).object = new Checker(Colors.DARK)
+                        this.getCell(j, i).checker = new Checker(Colors.DARK)
                     }
                 }
             } 
             if (i >= 5) {
                 for (let j = 0; j < this.cells[i].length; j++){
                     if ((i + j) % 2 !== 0){
-                        this.getCell(j, i).object = new Checker(Colors.LIGHT)
+                        this.getCell(j, i).checker = new Checker(Colors.LIGHT)
                     }
                 }
             }
-        } 
+        }  
+        
+    }
+
+    public getCheckersQty(){
+        let checkersQty = 0
+        for (let row of this.cells){
+            row.forEach(cell => cell.checker && checkersQty ++)
+        }
+        return checkersQty
     }
 
     public getBoardCopy(){

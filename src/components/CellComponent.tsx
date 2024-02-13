@@ -11,8 +11,8 @@ interface CellComponentProps {
 
 const CellComponent: FC<CellComponentProps> = ({cell, selectedCell, setSelectedCell, handleMove}) => {
     return (
-        <div onClick={() => {setSelectedCell(cell); setSelectedCell(cell); handleMove(cell)}} className={['cell', `cell-${cell.color === 'light' ? Colors.LIGHT : Colors.DARK}`, (selectedCell?.object && selectedCell === cell) ? 'selected' : ''].join(' ')}>
-            {cell.object && <div className={['checker', cell.object.color === Colors.LIGHT ? 'checker-light' : 'checker-dark', cell.object.isQueen ? 'queen' : ''].join(' ')}></div>}
+        <div onClick={() => {setSelectedCell(cell); setSelectedCell(cell); handleMove(cell)}} className={['cell', `cell-${cell.color === 'light' ? Colors.LIGHT : Colors.DARK}`, (selectedCell?.checker && selectedCell === cell) ? 'selected' : ''].join(' ')}>
+            {cell.checker && <div className={['checker', cell.checker.color === Colors.LIGHT ? 'checker-light' : 'checker-dark', cell.checker.isQueen ? 'queen' : ''].join(' ')}></div>}
         </div>
     );
 };
