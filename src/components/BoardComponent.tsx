@@ -69,7 +69,7 @@ const BoardComponent: FC<BoardComponentProps> = ({board, setBoard, restart}) => 
             {board.cells.map((row, index) => 
                 <React.Fragment key={index}>
                     {row.map(cell =>
-                        <CellComponent handleMove={handleMove} cell={cell} selectedCell={selectedCell} setSelectedCell={setSelectedCell}/>
+                        <CellComponent key={cell.id} handleMove={handleMove} cell={cell} selectedCell={selectedCell} setSelectedCell={setSelectedCell}/>
                         )}
                 </React.Fragment>
             )}

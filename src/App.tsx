@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './sass/App.scss'
 import { Board } from './models/Board';
 import BoardComponent from './components/BoardComponent';
-import { Colors } from './models/Colors';
+
 const App = () => {
   const [board, setBoard] = useState(new Board())
 

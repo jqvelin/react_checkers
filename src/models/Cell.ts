@@ -5,6 +5,7 @@ import { Colors } from "./Colors"
 export class Cell {
     x: number
     y: number
+    id: string
     checker: Checker | null
     color: Colors;
     isAvailable: boolean;
@@ -12,6 +13,7 @@ export class Cell {
     constructor(x: number, y: number, checker: Checker | null, color: Colors, isAvailable: boolean, board: Board){
         this.x = x
         this.y = y
+        this.id = `${x}-${y}`
         this.checker = checker
         this.color = color
         this.isAvailable = isAvailable
